@@ -6,6 +6,7 @@
 #include <sstream>
 #include <map>
 #include <set>
+#include <queue>
 
 #define REP(i,k,n) for(int i=k;i<n;i++)
 #define rep(i,n) for(int i=0;i<n;i++)
@@ -17,64 +18,51 @@ using namespace std;
 typedef long long ll;
 typedef pair<int,int> P;
 
-struct BIT {
-    vector<int> bit;
-
-    BIT(int n) : bit(n+1) {}
-
-    int sum(int i) {
-        int s = 0;
-        while(i > 0) {
-            s += bit[i];
-            i -= i & -i;
-        }
-        return s;
-    }
-
-    void add(int i,int x) {
-        while(i <= bit.size()) {
-            bit[i] += x;
-            i += i & -i;
-        }
-    }
-};
-
 int main() {
     int n;
     cin >> n;
 
-    vector<int> L(n);
-    vector<int> D(n);
-
+    vector<int> L(n),D(n);
     rep(i,n) cin >> L[i];
     rep(i,n) cin >> D[i];
 
-    vector<P> v(n);
-    int cnt[100005];
-    memset(cnt,0,sizeof(cnt));
+    vector<int> id(L.begin(),L.end());
+    sort(id.begin(),id.end());
+    id.erase(unique(id.begin(),id.end()),id.end());
 
+    int sum = 0;
+    map<int,vector<int> > m;
     rep(i,n) {
-        v[i] = mp(L[i],-D[i]);
-        cnt[L[i]]++;
-    }
-
-    for(int i=100005;i>=1;i--) {
-        cnt[i-1] += cnt[i];
-    }
-
-    sort(v.begin(),v.end());
-    rep(i,n) {
-        v[i].second *= -1;
+        m[L[i]].push_back(D[i]);
+        sum += D[i];
     }
     
-    BIT bit(n);
-    BIT bit2(n);
+    int ans = sum;
+    priority_queue<int> que;
+    rep(i,id.size()) {
+        vector<int> v(m[id[i]].begin(),m[id[i]].end());
+        int res = sum;
+        int cnt = v.size()-1;
 
-    rep(i,n) {
-        bit.add(i+1,v[i].first);
-        bit2.add(i+1,v[i].second);
+        rep(j,v.size()) res -= v[j];
+
+        vector<int> t;
+        while(que.size() && cnt) {
+            int q = que.top();
+            que.pop();
+
+            res -= q;
+            t.push_back(q);
+            cnt--;
+        }
+
+        ans = min(ans,res);
+
+        rep(j,t.size()) que.push(t[j]);
+        rep(j,v.size()) que.push(v[j]);
     }
-
     
+    cout << ans << endl;
+
     return 0;
 }
