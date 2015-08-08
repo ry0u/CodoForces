@@ -20,36 +20,48 @@ typedef pair<int,int> P;
 int cnt[1000005];
 
 int main() {
-
     int n;
     cin >> n;
 
-    memset(cnt,0,sizeof(cnt));
-    set<int> st;
-
+    vector<pair<string,int> > v(n);
     rep(i,n) {
-        string s;
-        int r;
-        cin >> s >> r;
-
-        if(s == "+") {
-            cnt[r]++;
-        }else {
-            cnt[r]--;
-        }
-
-        st.insert(r);
+        cin >> v[i].first >> v[i].second;
     }
 
-    int ans = 0;
-    set<int>::iterator ite;
-    for(ite = st.begin();ite != st.end(); ite++) {
-        if(cnt[*ite] <= 0) {
-            ans++;
+    vector<int> p;
+    memset(cnt,0,sizeof(cnt));
+
+    int sum = 0;
+
+    rep(i,n) {
+        string t = v[i].first;
+        int d = v[i].second;
+
+        if(t == "-" && cnt[d] == 0) {
+            sum++;
         }
+
+        if(t == "+") {
+            cnt[d]++;
+        }
+    }
+
+    int ans = sum;
+    rep(i,n) {
+        string t = v[i].first;
+        int d = v[i].second;
+
+        if(t == "+") {
+            sum++;
+        }else {
+            sum--;
+        }
+
+        ans = max(ans,sum);
     }
 
     cout << ans << endl;
+
 
     return 0;
 }
